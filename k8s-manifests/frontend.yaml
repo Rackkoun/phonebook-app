@@ -19,7 +19,7 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: API_URL
-          value:: "http://backend:8000"  # k8s dns service discovery
+          value: "http://backend:8000"  # k8s dns service discovery
         ports:
         - containerPort: 8080
 ---
