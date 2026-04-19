@@ -24,14 +24,14 @@ jobs:
       - name: Build Backend
         working-directory: ./backend
         run: |
-          docker build -t phonebook-backend:${{ github.sha }} .
+          docker build -t phonebook-backend:${{ github.sha }} -f Dockerfile .
           docker tag phonebook-backend:${{ github.sha }} phonebook-backend:latest
       
       # build frontend image
       - name: Build Frontend
         working-directory: ./frontend
         run: |
-          docker build -t phonebook-frontend:${{ github.sha }}
+          docker build -t phonebook-frontend:${{ github.sha }} -f Dockerfile .
           docker tag phonebook-frontend:${{ github.sha }} phonebook-frontend:latest
       
       # set up minikube

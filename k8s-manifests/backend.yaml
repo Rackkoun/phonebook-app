@@ -1,5 +1,5 @@
 # file k8s-manifests/backend.yaml
-apiVersion: app/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
@@ -16,7 +16,7 @@ spec:
       containers:
       - name: backend
         image: phonebook-backend:latest
-        imagePullPolicy: ifNotPresent
+        imagePullPolicy: IfNotPresent
         env:
         - name: DATABASE_URL
           value: "postgresql://user:password@postgres:5432/phonebookdb"

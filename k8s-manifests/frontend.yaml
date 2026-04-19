@@ -1,5 +1,5 @@
 # file k8s-manifests/frontend.yaml
-apiVersion: app/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
@@ -16,7 +16,7 @@ spec:
       containers:
       - name: frontend
         image: phonebook-frontend:latest
-        imagePullPolicy: ifNotPresent
+        imagePullPolicy: IfNotPresent
         env:
         - name: API_URL
           value:: "http://backend:8000"  # k8s dns service discovery

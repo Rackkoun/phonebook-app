@@ -24,7 +24,3 @@ class BackendConfig(BaseSettings):
         return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 backend_config = BackendConfig()
-
-# if __name__ == "__main__":
-#     print(f"PATH: {ROOT_PATH}")
-#     print(f"PWD: {backend_config.DB_PASSWORD}")
