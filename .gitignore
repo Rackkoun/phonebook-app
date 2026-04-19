@@ -1,0 +1,21 @@
+# virtualenv
+.devenv
+env
+.env
+venv
+.venv
+.python-version
+
+# Python
+__pycache__/
+*.py[codz]
+*.pyo
+*.pyd
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

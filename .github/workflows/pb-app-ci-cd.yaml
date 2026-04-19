@@ -1,0 +1,58 @@
+# file .github/workflows/pb-app-ci-cd.yaml
+name: Phonebook CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+  steps:
+    # checkout code
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    # setup docker buildx
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v4
+    
+    # build backend image
+    - name: Build Backend
+      working-directory: ./backend
+      run: |
+        docker build -t phonebook-backend:${{ github.sha }} .
+        docker tag phonebook-backend:${{ github.sha }} phonebook-backend:latest
+    
+    # build frontend image
+    - name: Build Frontend
+      working-directory: ./frontend
+      run: |
+        docker build -t phonebook-frontend:${{ github.sha }}
+        docker tag phonebook-frontend:${{ github.sha }} phonebook-frontend:latest
+    
+    # set up minikube
+    - name: Setup Minikube
+      uses: medyagh/setup-minikube@master
+    
+    # load images into minikube
+    - name: Load Images to Minikube
+      run: | 
+        minikube image load phonebook-backend:latest
+        minikube image load phonebook-frontend:latest
+    
+    # deploy to minikube
+    - name: Deploy to Minikube
+      run: |
+        kubectl apply -f k8s-manifests/
+        kubectl rollout status deployment/backend
+        kubectl rollout status deployment/frontend
+    
+    # verify deployment
+    - name: Verify Deployment
+      run |
+        kubectl get pods
+        kubectl get services
