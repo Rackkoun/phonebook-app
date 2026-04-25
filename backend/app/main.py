@@ -5,8 +5,7 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel
-import os
-from pathlib import Path
+
 from backend.config import backend_config
 
 # create engine
@@ -24,6 +23,10 @@ class Contact(Base):
     phone = Column(String)
     email = Column(String)
 
+
+# create tables on startup
+Base.metadata.create_all(bind=engine
+                         )
 # schema
 class ContactCreate(BaseModel):
     first_name: str

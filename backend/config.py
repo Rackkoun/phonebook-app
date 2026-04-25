@@ -2,7 +2,8 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import PostgresDsn, computed_field
 
 ROOT_PATH = Path(__file__).resolve().parents[1]
 
@@ -13,14 +14,20 @@ if ENV_FILE.exists():
 
 class BackendConfig(BaseSettings):
     
-    DB_USER: str = os.getenv("DB_USER")
-    DB_PASSWORD: str = os.getenv("DB_PASSWORD", "")
-    DB_HOST: str = os.getenv("DB_HOST", "localhost")
-    DB_NAME: str = os.getenv("DB_NAME")
-    DB_PORT: int = int(os.getenv("DB_PORT"))
+    model_config = SettingsConfigDict(
+        env_file=ROOT_PATH / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
+    DB_USER: str
+    DB_PASSWORD: str
+    DB_HOST: str
+    DB_NAME: str
+    DB_PORT: int = 5432
 
+    @computed_field
     @property
-    def POSTGRES_DB_URL(self) -> str:
+    def POSTGRES_DB_URL(self) -> PostgresDsn:
         return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 backend_config = BackendConfig()

@@ -23,7 +23,11 @@ jobs:
       # build backend image
       - name: Build Backend
         run: |
-          docker build -t phonebook-backend:${{ github.sha }} -f backend/Dockerfile .
+          docker build \
+            --build-arg DB_USER=${{ secrets.DB_USER }} \
+            --build-arg DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            -t phonebook-backend:${{ github.sha }} \
+            -f backend/Dockerfile .
           docker tag phonebook-backend:${{ github.sha }} phonebook-backend:latest
       
       # build frontend image

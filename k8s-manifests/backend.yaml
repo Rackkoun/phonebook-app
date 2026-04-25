@@ -17,9 +17,9 @@ spec:
       - name: backend
         image: phonebook-backend:latest
         imagePullPolicy: IfNotPresent
-        env:
-        - name: DATABASE_URL
-          value: "postgresql://user:password@postgres:5432/phonebookdb"
+        envFrom:
+        - secretRef:
+            name: phonebook-secrets
         ports:
         - containerPort: 8000
 ---
