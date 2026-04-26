@@ -45,16 +45,56 @@ jobs:
         run: | 
           minikube image load phonebook-backend:latest
           minikube image load phonebook-frontend:latest
-      
+
+      # create secrets for CI ince secret.yaml is gitignored
+      - name: Create K8s Secrets
+        run: |
+          kubectl create secret generic phonebook-secrets \
+            --from-literal=DB_USER=user \
+            --from-literal=DB_PASSWORD=password \
+            --from-literal=DB_HOST=postgres \
+            --from-literal=DB_NAME=phonebookdb \
+            --from-literal=DB_PORT=5432
+
       # deploy to minikube
       - name: Deploy to Minikube
         run: |
           kubectl apply -f k8s-manifests/
-          kubectl rollout status deployment/backend
-          kubectl rollout status deployment/frontend
+      
+      # wait for postgres first since backend depends on it
+      - name: Wait for Postgres
+        run: |
+          kubectl rollout status deployment/postgres --timeout=120s
+          kubectl wait --for=condition=ready pod -l app=postgres --timeout=120s
+      
+      # wait for backend (longer timeout)
+      - name: Wait for Backend
+        run: |
+          kubectl rollout status deployment/backend --timeout=180s
+      
+      # wait for frontend
+      - name: Wait for Frontend
+        run: |
+          kubectl rollout status deployment/frontend --timeout=120s
+      
+      # debug: show logs if anything failed
+      - name: Debug Logs
+        if: failure()
+        run: |
+          echo "=== ALL PODS ==="
+          kubectl get pods -o wide
+          echo "=== BACKEND LOGS ==="
+          kubectl logs deployment/backend --tail=50 || true
+          echo "=== POSTGRES ==="
+          kubectl logs deployment/postgres --tail=50 || true
+          echo "=== EVENTS ==="
+          kubectl get events --sort-by='.lastTimestamp' | tail -20
       
       # verify deployment
       - name: Verify Deployment
+        if: success()
         run: |
           kubectl get pods
           kubectl get services
+          kubectl port-forward svc/backend 8000:8000 & sleep 5
+          curl -f http://localhost:8000/docs || true
