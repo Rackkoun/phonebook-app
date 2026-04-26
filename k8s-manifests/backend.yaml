@@ -23,7 +23,7 @@ spec:
         ports:
         - containerPort: 8000
         # add health checks
-        readnessProbe:
+        readinessProbe:
           httpGet:
             path: /docs
             port: 8000
